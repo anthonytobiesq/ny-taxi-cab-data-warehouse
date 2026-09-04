@@ -1,0 +1,25 @@
+services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taxi_orchestrator
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: ["--year=2024", "--month=1", "--db-path=/app/data/yellow_taxi_trip.duckdb"]
+
+
+  notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taxi_notebook
+    volumes:
+      - ./data:/app/data
+      - ./notebooks:/app/notebooks
+    ports:
+      - "8888:8888"
+    entrypoint: [ "uv", "run", "jupyter", "lab" ]
+    command: [ "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''" ]
